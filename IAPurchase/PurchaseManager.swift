@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017 Razeware LLC
+ * Copyright (c) 2017 Towhidul Islam
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -91,9 +91,24 @@ public class PurchaseManager: NSObject {
         request.start()
     }
     
-    public func purchase(subscription: IAProduct) {
-        let payment = SKPayment(product: subscription.product)
+    public func purchase(inAppProduct: IAProduct) {
+        let payment = SKPayment(product: inAppProduct.product)
         SKPaymentQueue.default().add(payment)
+    }
+    
+    public func purchase(iapID: String) {
+        let first = products?.first(where: { (item: IAProduct) -> Bool in
+            return item.product.productIdentifier == iapID
+        })
+        guard let inAppProduct = first else { return }
+        purchase(inAppProduct: inAppProduct)
+    }
+    
+    public func isPurchased(iapID: String) -> Bool{
+        guard let session = savedSession else {
+            return false
+        }
+        return session.isPurchased(iapID)
     }
     
     public func restorePurchases() {
@@ -190,9 +205,11 @@ public class PurchaseManager: NSObject {
 // MARK: - SKProductsRequestDelegate
 
 extension PurchaseManager: SKProductsRequestDelegate {
+    
     public func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         products = response.products.map { IAProduct(product: $0) }
     }
+    
     public func request(_ request: SKRequest, didFailWithError error: Error) {
         if request is SKProductsRequest {
             print("Subscription Options Failed Loading: \(error.localizedDescription)")
@@ -206,6 +223,7 @@ extension PurchaseManager: SKProductsRequestDelegate {
 //MARK: 
 
 extension PurchaseManager: PaymentQueueObserverDelegate{
+    
     public func shouldHandleTransaction(forProductId: String) -> Bool{
         guard let optionItems = self.products else {
             return false;
@@ -219,4 +237,5 @@ extension PurchaseManager: PaymentQueueObserverDelegate{
         }
         return result
     }
+    
 }

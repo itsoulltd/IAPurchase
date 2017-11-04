@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017 Razeware LLC
+ * Copyright (c) 2017 Towhidul Islam
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -48,11 +48,51 @@ public enum ReceiptStatus: Int{
 public class Session: NGObject {
     
     public var id: String?
-    public var paidSubscriptions: [Subscription]?
+    private var paidSubscriptions: [Subscription]?
+    private var paidSubscriptionsByGroup: [String:[Subscription]]?
+    private var nonConsumptions: [NonConsumable]?
+    
+    public func isPurchased(_ iapID: String) -> Bool{
+        //Pick from current Subscription
+        if let cSub = currentSubscription, cSub.productIdentifier == iapID {
+            return cSub.isActive
+        }
+        //Pick from Subscription Group
+        if paidSubscriptionsByGroup == nil {
+            paidSubscriptionsByGroup = subscriptionsByGroup
+        }
+        if let pSubs = paidSubscriptionsByGroup?[iapID]{
+            let sortedByMostRecentPurchase = pSubs.sorted { $0.purchaseDate > $1.purchaseDate }
+            guard let sub = sortedByMostRecentPurchase.first else{
+                return false
+            }
+            return sub.isActive
+        }
+        //Pick from nonConsumed Items
+        guard let nonConsumableItems = nonConsumptions else { return false }
+        let isPurchased = nonConsumableItems.contains(where: { (item: NonConsumable) -> Bool in
+            return item.productIdentifier == iapID
+        })
+        return isPurchased
+    }
     
     public var currentSubscription: Subscription? {
         let sortedByMostRecentPurchase = paidSubscriptions?.sorted { $0.purchaseDate > $1.purchaseDate }
         return sortedByMostRecentPurchase?.first
+    }
+    
+    public var subscriptionsByGroup: [String:[Subscription]]?{
+        guard let pSubs = paidSubscriptions else { return nil }
+        //
+        let container = pSubs.reduce(into: [String: [Subscription]]()) { (results, item: Subscription) in
+            if(results.keys.contains(item.productIdentifier)){
+                var items = results[item.productIdentifier]
+                items?.append(item)
+            }else{
+                results[item.productIdentifier] = Array<Subscription>(arrayLiteral: item)
+            }
+        }
+        return container
     }
     
     @objc public var receiptData: Data?
@@ -84,15 +124,18 @@ public class Session: NGObject {
         self.parsedReceipt = json
         
         if let latestPurchases = parsedReceipt!["latest_receipt_info"] as? Array<[String: Any]>{
-            var subscriptions = [Subscription]()
+            paidSubscriptions = [Subscription]()
+            nonConsumptions = [NonConsumable]()
+            //
             for purchase in latestPurchases {
                 if let paidSubscription = Subscription(json: purchase) {
-                    subscriptions.append(paidSubscription)
+                    paidSubscriptions?.append(paidSubscription)
+                }
+                else if let nonConsumable = NonConsumable(json: purchase){
+                    nonConsumptions?.append(nonConsumable)
                 }
             }
-            paidSubscriptions = subscriptions
-        } else {
-            paidSubscriptions = []
+            //
         }
     }
     

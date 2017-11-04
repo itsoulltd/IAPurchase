@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017 Razeware LLC
+ * Copyright (c) 2017 Towhidul Islam
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,32 @@
 
 import Foundation
 
+@objc(NonConsumable)
+@objcMembers
+public class NonConsumable: NSObject {
+    
+    public var productIdentifier: String
+    public var purchaseDate: Date
+    public var transactionId: String
+    
+    public init?(json: [String: Any]) {
+        guard
+            let productId = json["product_id"] as? String,
+            let purchaseDateString = json["purchase_date"] as? String,
+            let purchaseDate = dateFormatter.date(from: purchaseDateString),
+            let transaction_id = json["transaction_id"] as? String
+            else {
+                return nil
+        }
+        
+        self.productIdentifier = productId
+        self.purchaseDate = purchaseDate
+        self.transactionId = transaction_id
+        
+    }
+    
+}
+
 private let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyy-MM-dd HH:mm:ss VV"
@@ -31,14 +57,11 @@ private let dateFormatter: DateFormatter = {
 
 @objc(Subscription)
 @objcMembers
-public class Subscription: NSObject {
+public class Subscription: NonConsumable {
     
-    public let productIdentifier: String
-    public let purchaseDate: Date
-    public let expiresDate: Date
-    public let transactionId: String
+    public var expiresDate: Date
     public var cancellationDate: Date?
-    public let isTrialPeriod: Bool
+    public var isTrialPeriod: Bool
     
     public var isActive: Bool {
         if isCancelled{
@@ -55,24 +78,21 @@ public class Subscription: NSObject {
         return (cancellationDate != nil)
     }
     
-    public init?(json: [String: Any]) {
+    public override init?(json: [String: Any]) {
         guard
-            let productId = json["product_id"] as? String,
+            let _ = json["product_id"] as? String,
             let purchaseDateString = json["purchase_date"] as? String,
-            let purchaseDate = dateFormatter.date(from: purchaseDateString),
+            let _ = dateFormatter.date(from: purchaseDateString),
+            let _ = json["transaction_id"] as? String,
             let expiresDateString = json["expires_date"] as? String,
             let expiresDate = dateFormatter.date(from: expiresDateString),
-            let transaction_id = json["transaction_id"] as? String,
             let is_trial_period = json["is_trial_period"] as? String
             else {
                 return nil
         }
-        
-        self.productIdentifier = productId
-        self.purchaseDate = purchaseDate
         self.expiresDate = expiresDate
-        self.transactionId = transaction_id
         self.isTrialPeriod = (is_trial_period == "true") ? true : false;
+        super.init(json: json)
         
         if let cancellationDateStr = json["cancellation-date"] as? String{
             cancellationDate = dateFormatter.date(from: cancellationDateStr)
