@@ -100,7 +100,7 @@ public class PurchaseManager: NSObject {
         let first = products?.first(where: { (item: IAProduct) -> Bool in
             return item.product.productIdentifier == iapID
         })
-        guard let inAppProduct = first else { return }
+        guard let inAppProduct = first else { fatalError("IAP ID not given.") }
         purchase(inAppProduct: inAppProduct)
     }
     
