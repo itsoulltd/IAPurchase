@@ -12,6 +12,7 @@ import StoreKit
 @objc(PaymentQueueObserverDelegate)
 public protocol PaymentQueueObserverDelegate: NSObjectProtocol{
     func shouldHandleTransaction(forProductId: String) -> Bool
+    func shouldAddStorePayment(forProductId: String) -> Bool
 }
 
 public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
@@ -139,6 +140,11 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
             return
         }
         //print("Purchase deferred for product id: \(transaction.payment.productIdentifier)")
+    }
+    
+    public func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
+        guard let service = _service else { return false }
+        return service.shouldAddStorePayment(forProductId: product.productIdentifier);
     }
     
 }

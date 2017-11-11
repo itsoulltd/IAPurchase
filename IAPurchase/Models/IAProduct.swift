@@ -34,8 +34,12 @@ private var formatter: NumberFormatter = {
 //@objc(IAProduct)
 @objcMembers
 public class IAProduct: NSObject {
-  public let product: SKProduct
-  public let formattedPrice: String
+    public let product: SKProduct
+    public let formattedPrice: String
+    public var identifier:String {
+        return product.productIdentifier
+    }
+    public var shouldAddStorePayment: Bool = false
   
   public init(product: SKProduct) {
     self.product = product
@@ -46,4 +50,5 @@ public class IAProduct: NSObject {
     
     formattedPrice = formatter.string(from: product.price) ?? "\(product.price)"
   }
+    
 }

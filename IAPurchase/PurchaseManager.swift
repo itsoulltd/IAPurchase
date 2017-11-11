@@ -238,4 +238,15 @@ extension PurchaseManager: PaymentQueueObserverDelegate{
         return result
     }
     
+    public func shouldAddStorePayment(forProductId: String) -> Bool {
+        guard let optionItems = self.products else {
+            return false;
+        }
+        let find = optionItems.first { (item: IAProduct) -> Bool in
+            return item.identifier == forProductId
+        }
+        guard let actItem = find else { return false }
+        return actItem.shouldAddStorePayment
+    }
+    
 }
