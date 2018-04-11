@@ -17,7 +17,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        PurchaseManager.shared.startTransactionObserver(sharedSecrate: "64677de31f9e4a46b1700984d2ac9274")
+        #if DEBUG
+            PurchaseManager.shared.startTransactionObserver(sharedSecrate: "eea3614d1e324465927dc21cde51a60c", debug: true)
+        #else
+            PurchaseManager.shared.startTransactionObserver(sharedSecrate: "eea3614d1e324465927dc21cde51a60c", debug: false)
+        #endif
         return true
     }
 

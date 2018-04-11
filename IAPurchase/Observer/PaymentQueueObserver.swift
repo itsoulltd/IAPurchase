@@ -40,8 +40,9 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
                 : transaction.payment.productIdentifier
         })
         //print("RestoreCompletedTransaction failed for product ids: \(ids)")
-        DispatchQueue.main.async { 
-            NotificationCenter.default.post(name: PurchaseManager.restoreFailureNotification, object: nil, userInfo: ["ids":ids,"error":error.localizedDescription])
+        DispatchQueue.main.async {
+            let uniqueids = NSOrderedSet(array: ids).array
+            NotificationCenter.default.post(name: PurchaseManager.restoreFailureNotification, object: nil, userInfo: ["ids":uniqueids,"error":error.localizedDescription])
         }
     }
     
@@ -59,8 +60,16 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
             }
         }else{
             PurchaseManager.shared.uploadReceipt { (success) in
+                guard success else{
+                    DispatchQueue.main.async {
+                        let uniqueids = NSOrderedSet(array: ids).array
+                        NotificationCenter.default.post(name: PurchaseManager.restoreFailureNotification, object: nil, userInfo: ["ids":uniqueids,"error":"uploadReceipt failed!"])
+                    }
+                    return
+                }
                 DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: PurchaseManager.restoreSuccessfulNotification, object: nil, userInfo: ["ids":ids])
+                    let uniqueids = NSOrderedSet(array: ids).array
+                    NotificationCenter.default.post(name: PurchaseManager.restoreSuccessfulNotification, object: nil, userInfo: ["ids":uniqueids])
                 }
             }
         }
@@ -101,6 +110,9 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
         //print("User purchased product id: \(transaction.payment.productIdentifier)")
         queue.finishTransaction(transaction)
         PurchaseManager.shared.uploadReceipt { (success) in
+            guard success else{
+                return
+            }
             DispatchQueue.main.async {
                 NotificationCenter.default.post(name: PurchaseManager.purchaseSuccessfulNotification, object: nil, userInfo: ["id":transaction.payment.productIdentifier,"status":NSNumber(value: success)])
             }

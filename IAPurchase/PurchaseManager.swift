@@ -119,6 +119,7 @@ public class PurchaseManager: NSObject {
         if let receiptData = loadReceipt() {
             upload(receipt: receiptData, onCompletion: { [weak self] (session, error) in
                 guard let strongSelf = self else{
+                    completion(false)
                     return
                 }
                 if let session = session{
@@ -159,11 +160,21 @@ public class PurchaseManager: NSObject {
         request.httpBody = bodyData
         //Create Task
         let task = URLSession.shared.dataTask(with: request) { (responseData, response, error) in
-            if let error = error {
+            if let res = response as? HTTPURLResponse {
+                if (res.statusCode == 200 || res.statusCode == 201){
+                    if let responseData = responseData {
+                        let session = Session(decryptedData: responseData)
+                        onCompletion(session, nil)
+                    }
+                    else{
+                        onCompletion(nil, error)
+                    }
+                }else{
+                    onCompletion(nil, error)
+                }
+            }
+            else{
                 onCompletion(nil, error)
-            } else if let responseData = responseData {
-                let session = Session(decryptedData: responseData)
-                onCompletion(session, nil)
             }
         }
         //Start Task
