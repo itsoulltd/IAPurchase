@@ -109,15 +109,15 @@ public class Session: NGObject {
         super.init(coder: aDecoder)
     }
     
-    public init(decryptedData: Data) {
+    public init(decryptedData: Data, debugMode: Bool = false) {
         super.init()
         loader(decryptedData: decryptedData)
     }
     
-    private func loader(decryptedData: Data){
+    private func loader(decryptedData: Data, debugMode: Bool = false){
         
         let json = try! JSONSerialization.jsonObject(with: decryptedData, options: []) as! Dictionary<String, Any>
-        print(json)
+        if debugMode { print(json) }
         
         id = UUID().uuidString
         self.receiptData = decryptedData

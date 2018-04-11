@@ -159,11 +159,12 @@ public class PurchaseManager: NSObject {
         request.httpMethod = "POST"
         request.httpBody = bodyData
         //Create Task
+        let isDebugMode = debugMode
         let task = URLSession.shared.dataTask(with: request) { (responseData, response, error) in
             if let res = response as? HTTPURLResponse {
                 if (res.statusCode == 200 || res.statusCode == 201){
                     if let responseData = responseData {
-                        let session = Session(decryptedData: responseData)
+                        let session = Session(decryptedData: responseData, debugMode: isDebugMode)
                         onCompletion(session, nil)
                     }
                     else{
@@ -206,7 +207,7 @@ public class PurchaseManager: NSObject {
             let data = try Data(contentsOf: url)
             return data
         } catch {
-            print("Error loading receipt data: \(error.localizedDescription)")
+            if debugMode {print("Error loading receipt data: \(error.localizedDescription)")}
             return nil
         }
     }
@@ -223,7 +224,7 @@ extension PurchaseManager: SKProductsRequestDelegate {
     
     public func request(_ request: SKRequest, didFailWithError error: Error) {
         if request is SKProductsRequest {
-            print("Subscription Options Failed Loading: \(error.localizedDescription)")
+            if debugMode {print("Subscription Options Failed Loading: \(error.localizedDescription)")}
         }
         if let block = onLoadCompletionBlock {
             block(nil)
