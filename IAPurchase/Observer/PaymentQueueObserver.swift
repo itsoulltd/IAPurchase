@@ -35,9 +35,13 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
     public func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
         
         let ids: [String] = queue.transactions.flatMap({ (transaction) -> String? in
-            return (shouldHandle(productId: transaction.payment.productIdentifier) == false)
-                ? nil
-                : transaction.payment.productIdentifier
+            if (shouldHandle(productId: transaction.payment.productIdentifier) == false){
+                return nil
+            }else{
+                return (transaction.transactionState == SKPaymentTransactionState.failed)
+                    ? transaction.payment.productIdentifier
+                    : nil
+            }
         })
         //print("RestoreCompletedTransaction failed for product ids: \(ids)")
         DispatchQueue.main.async {
@@ -49,9 +53,15 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
     public func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
         
         let ids: [String] = queue.transactions.flatMap({ (transaction) -> String? in
-            return (shouldHandle(productId: transaction.payment.productIdentifier) == false)
-                ? nil
-                : transaction.payment.productIdentifier
+            if (shouldHandle(productId: transaction.payment.productIdentifier) == false){
+                return nil
+            }else{
+                return (transaction.transactionState == SKPaymentTransactionState.failed
+                    || transaction.transactionState == SKPaymentTransactionState.deferred
+                    || transaction.transactionState == SKPaymentTransactionState.purchasing)
+                    ? nil
+                    : transaction.payment.productIdentifier
+            }
         })
         //print("RestoreCompletedTransaction finished for product ids: \(ids)")
         if ids.count <= 0 {

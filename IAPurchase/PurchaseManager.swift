@@ -111,6 +111,13 @@ public class PurchaseManager: NSObject {
         return session.isPurchased(iapID)
     }
     
+    public func productType(by iapID: String) -> NonConsumable?{
+        guard let session = savedSession else {
+            return nil
+        }
+        return session.productType(by: iapID)
+    }
+    
     public func restorePurchases() {
         SKPaymentQueue.default().restoreCompletedTransactions()
     }

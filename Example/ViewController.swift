@@ -23,28 +23,49 @@ class ViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(purchaseFailed(notification:)), name: PurchaseManager.purchaseFailureNotification, object: nil)
         
         // Do any additional setup after loading the view, typically from a nib.
-        PurchaseManager.shared.loadSubscription(productIDs: ["com.tasnim.kitemakeup.subscription.yearly"]) { (items: [IAProduct]?) in
-            
+        PurchaseManager.shared.loadSubscription(productIDs: ["com.tasnim.kitemakeup.subscription.yearly","com.tasnim.kitemakeup.onetimepurchase"]) { (items: [IAProduct]?) in
+            //
             guard let xsubs = items else{
+                //If there is no internet and user ever had a purchse.
                 PurchaseManager.shared.uploadReceipt(completion: { (success) in
-                    guard let paidSubs = PurchaseManager.shared.currentSubscription else{
-                        return
+                    //This is offline test.
+                    let purchasedId = "com.tasnim.kitemakeup.subscription.yearly"
+                    if PurchaseManager.shared.isPurchased(iapID: purchasedId){
+                        
+                        let type = PurchaseManager.shared.productType(by: purchasedId)
+                        if type is Subscription{
+                            guard let paidSubs = type as? Subscription else{
+                                return
+                            }
+                            print("\(paidSubs.productIdentifier) : isActive : \(paidSubs.isActive) : \(paidSubs.expiresDate)")
+                            print("isCanceled : \(paidSubs.isCancelled)")
+                            print("TransactionID : \(paidSubs.transactionId)")
+                            
+                        }else{
+                            guard let paidSubs = type else{
+                                return
+                            }
+                            print("\(paidSubs.productIdentifier) : isActive : YES : \(paidSubs.purchaseDate)")
+                            print("TransactionID : \(paidSubs.transactionId)")
+                        }
+                        
+                        print("Receipt Status : \(PurchaseManager.shared.currentSessionStatus.toString())")
+                        
                     }
-                    print("isActive : \(paidSubs.isActive)")
-                    print("\(paidSubs.productIdentifier) : \(paidSubs.expiresDate)")
-                    print("isCanceled : \(paidSubs.isCancelled)")
-                    print("Receipt Status : \(PurchaseManager.shared.currentSessionStatus.toString())")
                 })
                 return
             }
-            for subscription in xsubs{
-                print("\(subscription.product.productIdentifier) : \(subscription.formattedPrice)")
-                print("\(subscription.product.localizedDescription)")
-            }
-            //How to purchase, for testing first one is purchased.
-            if let subscriptionToBuy = xsubs.first{
-                PurchaseManager.shared.purchase(inAppProduct: subscriptionToBuy)
-                //PurchaseManager.shared.restorePurchases()
+            //Print products info
+            for iapProduct in xsubs{
+                print("\(iapProduct.product.productIdentifier) : \(iapProduct.formattedPrice)")
+                print("\(iapProduct.product.localizedDescription)")
+                
+                //How to purchase, for testing first one is purchased.
+                if iapProduct.identifier == "com.tasnim.kitemakeup.onetimepurchase"{
+                    //PurchaseManager.shared.purchase(inAppProduct: iapProduct)
+                    //PurchaseManager.shared.restorePurchases()
+                }
+                //
             }
             //
         }
@@ -56,31 +77,54 @@ class ViewController: UIViewController {
     }
     
     @objc func purchaseSuscess(note: Notification) -> Void {
-        //For Test Load the receipt
-        guard let paidSubs = PurchaseManager.shared.currentSubscription else{
-            return
+        
+        guard let purchasedId = note.userInfo?["id"] as? String else { return }
+        
+        if PurchaseManager.shared.isPurchased(iapID: purchasedId){
+            
+            let type = PurchaseManager.shared.productType(by: purchasedId)
+            if type is Subscription{
+                guard let paidSubs = type as? Subscription else{
+                    return
+                }
+                print("\(paidSubs.productIdentifier) : isActive : \(paidSubs.isActive) : \(paidSubs.expiresDate)")
+                print("isCanceled : \(paidSubs.isCancelled)")
+                print("TransactionID : \(paidSubs.transactionId)")
+                
+            }else{
+                guard let paidSubs = type else{
+                    return
+                }
+                print("\(paidSubs.productIdentifier) : isActive : YES : \(paidSubs.purchaseDate)")
+                print("TransactionID : \(paidSubs.transactionId)")
+            }
+            
+            print("Receipt Status : \(PurchaseManager.shared.currentSessionStatus.toString())")
+            
+        }else{
+            print("Unsatisfied results")
         }
-        print("isActive : \(paidSubs.isActive)")
-        print("\(paidSubs.productIdentifier) : \(paidSubs.expiresDate)")
-        print("isCanceled : \(paidSubs.isCancelled)")
-        print("Receipt Status : \(PurchaseManager.shared.currentSessionStatus.toString())")
+        
     }
     
     @objc func restoreSuscess(note: Notification) -> Void {
         //For Test Load the receipt
-        guard let restoredIds = note.userInfo?["ids"] as? [String] else{
-            print("no items to restore")
-            return
-        }
+        guard let restoredIds = note.userInfo?["ids"] as? [String] else{ return }
         print(restoredIds)
     }
     
     @objc func purchaseFailed(notification: Notification) -> Void {
-        print(notification.userInfo as Any)
+        guard let err = notification.userInfo?["error"] as? String else { return }
+        print(err)
+        guard let purchasedId = notification.userInfo?["id"] as? String else { return }
+        print(purchasedId)
     }
     
     @objc func restoreFailed(notification: Notification) -> Void {
-        print(notification.userInfo as Any)
+        guard let err = notification.userInfo?["error"] as? String else { return }
+        print(err)
+        guard let restoredIds = notification.userInfo?["ids"] as? [String] else { return }
+        print(restoredIds)
     }
 
 

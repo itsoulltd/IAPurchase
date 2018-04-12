@@ -76,6 +76,30 @@ public class Session: NGObject {
         return isPurchased
     }
     
+    public func productType(by iapID: String) -> NonConsumable?{
+        //Pick from current Subscription
+        if let cSub = currentSubscription, cSub.productIdentifier == iapID {
+            return cSub
+        }
+        //Pick from Subscription Group
+        if paidSubscriptionsByGroup == nil {
+            paidSubscriptionsByGroup = subscriptionsByGroup
+        }
+        if let pSubs = paidSubscriptionsByGroup?[iapID]{
+            let sortedByMostRecentPurchase = pSubs.sorted { $0.purchaseDate > $1.purchaseDate }
+            guard let sub = sortedByMostRecentPurchase.first else{
+                return nil
+            }
+            return sub
+        }
+        //Pick from nonConsumed Items
+        guard let nonConsumableItems = nonConsumptions else { return nil }
+        let filteredItems = nonConsumableItems.filter { (item: NonConsumable) -> Bool in
+            return item.productIdentifier == iapID
+        }
+        return filteredItems.first
+    }
+    
     public var currentSubscription: Subscription? {
         let sortedByMostRecentPurchase = paidSubscriptions?.sorted { $0.purchaseDate > $1.purchaseDate }
         return sortedByMostRecentPurchase?.first
