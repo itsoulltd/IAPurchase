@@ -23,7 +23,7 @@ class ViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(purchaseFailed(notification:)), name: PurchaseManager.purchaseFailureNotification, object: nil)
         
         // Do any additional setup after loading the view, typically from a nib.
-        PurchaseManager.shared.loadSubscription(productIDs: ["com.tasnim.kitemakeup.subscription.yearly","com.tasnim.kitemakeup.onetimepurchase"]) { (items: [IAProduct]?) in
+        PurchaseManager.shared.loadIAProducts(productIDs: ["com.tasnim.kitemakeup.subscription.yearly","com.tasnim.kitemakeup.onetimepurchase"]) { (items: [IAProduct]?) in
             //
             guard let xsubs = items else{
                 //If there is no internet and user ever had a purchse.

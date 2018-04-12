@@ -84,7 +84,7 @@ public class PurchaseManager: NSObject {
         paymentObserver.removeObserver()
     }
     
-    public func loadSubscription(productIDs:[String], onCompletion:OnProductsLoadCompletion? = nil) {
+    public func loadIAProducts(productIDs:[String], onCompletion:OnProductsLoadCompletion? = nil) {
         onLoadCompletionBlock = onCompletion
         let request = SKProductsRequest(productIdentifiers: Set(productIDs))
         request.delegate = self
