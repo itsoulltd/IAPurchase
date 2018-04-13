@@ -22,6 +22,58 @@ class ViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(purchaseFailed(notification:)), name: PurchaseManager.purchaseFailureNotification, object: nil)
         
+        loadTest()
+    }
+    
+    fileprivate func loadTest(){
+        
+        //PurchaseManager.shared.loadIAProducts(productIDs: [], onCompletion:nil)
+        
+        PurchaseManager.shared.loadIAProducts(productIDs: ["com.tasnim.kitemakeup.subscription.yearly","com.tasnim.kitemakeup.subscription.monthly"])
+        { (items: [IAProduct]?) in
+            guard let items = items else{
+                return
+            }
+            for iapProduct in items{
+                print("\(iapProduct.product.productIdentifier) : \(iapProduct.formattedPrice)")
+                print("\(iapProduct.product.localizedDescription)")
+            }
+            
+            //Adding New Items
+            DispatchQueue.main.async {
+                PurchaseManager.shared.loadIAProducts(productIDs: ["com.tasnim.kitemakeup.onetimepurchase"], onCompletion: { (items: [IAProduct]?) in
+                    guard let items = items else{
+                        return
+                    }
+                    for iapProduct in items{
+                        print("\(iapProduct.product.productIdentifier) : \(iapProduct.formattedPrice)")
+                        print("\(iapProduct.product.localizedDescription)")
+                    }
+                    
+                    //Just Fetching existing items
+                    DispatchQueue.main.async {
+                        PurchaseManager.shared.loadIAProducts(productIDs: [], onCompletion: { (items: [IAProduct]?) in
+                            guard let items = items else{
+                                return
+                            }
+                            for iapProduct in items{
+                                print("\(iapProduct.product.productIdentifier) : \(iapProduct.formattedPrice)")
+                                print("\(iapProduct.product.localizedDescription)")
+                            }
+                            
+                            //Nothing Check
+                            DispatchQueue.main.async {
+                                PurchaseManager.shared.loadIAProducts(productIDs: [], onCompletion:nil)
+                            }
+                        })
+                    }
+                })
+            }
+        }
+        
+    }
+    
+    fileprivate func purchaseTest() {
         // Do any additional setup after loading the view, typically from a nib.
         PurchaseManager.shared.loadIAProducts(productIDs: ["com.tasnim.kitemakeup.subscription.yearly","com.tasnim.kitemakeup.onetimepurchase"]) { (items: [IAProduct]?) in
             //

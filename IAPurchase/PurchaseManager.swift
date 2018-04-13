@@ -59,6 +59,7 @@ public class PurchaseManager: NSObject {
         didSet {
             if let block = onLoadCompletionBlock{
                 block(products)
+                onLoadCompletionBlock = nil
             }
         }
     }
@@ -85,10 +86,19 @@ public class PurchaseManager: NSObject {
     }
     
     public func loadIAProducts(productIDs:[String], onCompletion:OnProductsLoadCompletion? = nil) {
-        onLoadCompletionBlock = onCompletion
-        let request = SKProductsRequest(productIdentifiers: Set(productIDs))
-        request.delegate = self
-        request.start()
+        if productIDs.count == 0 && onCompletion != nil {
+            onCompletion!(self.products)
+            return
+        }
+        if onLoadCompletionBlock != nil{
+            return
+        }
+        if productIDs.count > 0{
+            if (onCompletion != nil) { onLoadCompletionBlock = onCompletion }
+            let request = SKProductsRequest(productIdentifiers: Set(productIDs))
+            request.delegate = self
+            request.start()
+        }
     }
     
     public func purchase(inAppProduct: IAProduct) {
@@ -97,11 +107,13 @@ public class PurchaseManager: NSObject {
     }
     
     public func purchase(iapID: String) {
-        let first = products?.first(where: { (item: IAProduct) -> Bool in
-            return item.product.productIdentifier == iapID
-        })
-        guard let inAppProduct = first else { fatalError("IAP ID not given.") }
-        purchase(inAppProduct: inAppProduct)
+        DispatchQueue.main.async {
+            let first = self.products?.first(where: { (item: IAProduct) -> Bool in
+                return item.product.productIdentifier == iapID
+            })
+            guard let inAppProduct = first else { fatalError("IAP ID not given.") }
+            self.purchase(inAppProduct: inAppProduct)
+        }
     }
     
     public func isPurchased(iapID: String) -> Bool{
@@ -226,15 +238,21 @@ public class PurchaseManager: NSObject {
 extension PurchaseManager: SKProductsRequestDelegate {
     
     public func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
-        products = response.products.map { IAProduct(product: $0) }
+        DispatchQueue.main.async {
+            var items = response.products.map { IAProduct(product: $0) }
+            if let olds = self.products {
+                items.append(contentsOf: olds)
+            }
+            self.products = items
+        }
     }
     
     public func request(_ request: SKRequest, didFailWithError error: Error) {
         if request is SKProductsRequest {
             if debugMode {print("Subscription Options Failed Loading: \(error.localizedDescription)")}
         }
-        if let block = onLoadCompletionBlock {
-            block(nil)
+        DispatchQueue.main.async {
+            self.products = self.products ?? nil
         }
     }
 }
