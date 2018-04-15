@@ -106,13 +106,21 @@ public class PurchaseManager: NSObject {
         SKPaymentQueue.default().add(payment)
     }
     
-    public func purchase(iapID: String) {
+    public func purchase(iapID: String, onCompletion: ((_ isInitiated: Bool)->Void)? = nil) {
         DispatchQueue.main.async {
             let first = self.products?.first(where: { (item: IAProduct) -> Bool in
                 return item.product.productIdentifier == iapID
             })
-            guard let inAppProduct = first else { fatalError("IAP ID not given.") }
+            guard let inAppProduct = first else {
+                if let onCompletion = onCompletion {
+                    onCompletion(false)
+                }
+                return
+            }
             self.purchase(inAppProduct: inAppProduct)
+            if let onCompletion = onCompletion {
+                onCompletion(true)
+            }
         }
     }
     
@@ -241,7 +249,12 @@ extension PurchaseManager: SKProductsRequestDelegate {
         DispatchQueue.main.async {
             var items = response.products.map { IAProduct(product: $0) }
             if let olds = self.products {
-                items.append(contentsOf: olds)
+                //Avoiding Duplication.
+                for product in olds{
+                    if items.contains(product) == false {
+                        items.append(product)
+                    }
+                }
             }
             self.products = items
         }

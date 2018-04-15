@@ -24,11 +24,11 @@ import Foundation
 import StoreKit
 
 private var formatter: NumberFormatter = {
-  let formatter = NumberFormatter()
-  formatter.numberStyle = .currency
-  formatter.formatterBehavior = .behavior10_4
-  
-  return formatter
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .currency
+    formatter.formatterBehavior = .behavior10_4
+    
+    return formatter
 }()
 
 //@objc(IAProduct)
@@ -40,15 +40,23 @@ public class IAProduct: NSObject {
         return product.productIdentifier
     }
     public var shouldAddStorePayment: Bool = false
-  
-  public init(product: SKProduct) {
-    self.product = product
     
-    if formatter.locale != self.product.priceLocale {
-      formatter.locale = self.product.priceLocale
+    public init(product: SKProduct) {
+        self.product = product
+        
+        if formatter.locale != self.product.priceLocale {
+            formatter.locale = self.product.priceLocale
+        }
+        
+        formattedPrice = formatter.string(from: product.price) ?? "\(product.price)"
     }
     
-    formattedPrice = formatter.string(from: product.price) ?? "\(product.price)"
-  }
+    public override var hashValue: Int{
+        return identifier.hashValue
+    }
+    
+    public override func isEqual(_ object: Any?) -> Bool {
+        return self.identifier == (object as? IAProduct)?.identifier
+    }
     
 }

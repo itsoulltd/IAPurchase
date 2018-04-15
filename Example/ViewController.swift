@@ -114,8 +114,10 @@ class ViewController: UIViewController {
                 
                 //How to purchase, for testing first one is purchased.
                 if iapProduct.identifier == "com.tasnim.kitemakeup.onetimepurchase"{
-                    //PurchaseManager.shared.purchase(inAppProduct: iapProduct)
                     //PurchaseManager.shared.restorePurchases()
+                    PurchaseManager.shared.purchase(iapID: "com.tasnim.kitemakeup.onetimepurchase", onCompletion: { (isInitiated) in
+                        print("Purchase Initiated \(isInitiated)")
+                    })
                 }
                 //
             }
