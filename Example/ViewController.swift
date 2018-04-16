@@ -14,13 +14,13 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(restoreFailed(notification:)), name: PurchaseManager.restoreFailureNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(restoreFailed(notification:)), name: IAPurchaseManager.restoreFailureNotification, object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(restoreSuscess(note:)), name: PurchaseManager.restoreSuccessfulNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(restoreSuscess(note:)), name: IAPurchaseManager.restoreSuccessfulNotification, object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(purchaseSuscess(note:)), name: PurchaseManager.purchaseSuccessfulNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(purchaseSuscess(note:)), name: IAPurchaseManager.purchaseSuccessfulNotification, object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(purchaseFailed(notification:)), name: PurchaseManager.purchaseFailureNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(purchaseFailed(notification:)), name: IAPurchaseManager.purchaseFailureNotification, object: nil)
         
         loadTest()
     }
