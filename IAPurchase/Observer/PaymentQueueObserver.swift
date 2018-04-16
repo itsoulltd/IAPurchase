@@ -46,7 +46,7 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
         //print("RestoreCompletedTransaction failed for product ids: \(ids)")
         DispatchQueue.main.async {
             let uniqueids = NSOrderedSet(array: ids).array
-            NotificationCenter.default.post(name: PurchaseManager.restoreFailureNotification, object: nil, userInfo: ["ids":uniqueids,"error":error.localizedDescription])
+            NotificationCenter.default.post(name: IAPurchaseManager.restoreFailureNotification, object: nil, userInfo: ["ids":uniqueids,"error":error.localizedDescription])
         }
     }
     
@@ -66,20 +66,20 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
         //print("RestoreCompletedTransaction finished for product ids: \(ids)")
         if ids.count <= 0 {
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: PurchaseManager.restoreFailureNotification, object: nil, userInfo: ["ids":ids])
+                NotificationCenter.default.post(name: IAPurchaseManager.restoreFailureNotification, object: nil, userInfo: ["ids":ids])
             }
         }else{
-            PurchaseManager.shared.uploadReceipt { (success) in
+            IAPurchaseManager.shared.uploadReceipt { (success) in
                 guard success else{
                     DispatchQueue.main.async {
                         let uniqueids = NSOrderedSet(array: ids).array
-                        NotificationCenter.default.post(name: PurchaseManager.restoreFailureNotification, object: nil, userInfo: ["ids":uniqueids,"error":"uploadReceipt failed!"])
+                        NotificationCenter.default.post(name: IAPurchaseManager.restoreFailureNotification, object: nil, userInfo: ["ids":uniqueids,"error":"uploadReceipt failed!"])
                     }
                     return
                 }
                 DispatchQueue.main.async {
                     let uniqueids = NSOrderedSet(array: ids).array
-                    NotificationCenter.default.post(name: PurchaseManager.restoreSuccessfulNotification, object: nil, userInfo: ["ids":uniqueids])
+                    NotificationCenter.default.post(name: IAPurchaseManager.restoreSuccessfulNotification, object: nil, userInfo: ["ids":uniqueids])
                 }
             }
         }
@@ -119,12 +119,12 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
         }
         //print("User purchased product id: \(transaction.payment.productIdentifier)")
         queue.finishTransaction(transaction)
-        PurchaseManager.shared.uploadReceipt { (success) in
+        IAPurchaseManager.shared.uploadReceipt { (success) in
             guard success else{
                 return
             }
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: PurchaseManager.purchaseSuccessfulNotification, object: nil, userInfo: ["id":transaction.payment.productIdentifier,"status":NSNumber(value: success)])
+                NotificationCenter.default.post(name: IAPurchaseManager.purchaseSuccessfulNotification, object: nil, userInfo: ["id":transaction.payment.productIdentifier,"status":NSNumber(value: success)])
             }
         }
     }
@@ -152,7 +152,7 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
             if let err = transaction.error{
                 info["error"] = err.localizedDescription
             }
-            NotificationCenter.default.post(name: PurchaseManager.purchaseFailureNotification, object: nil, userInfo: info)
+            NotificationCenter.default.post(name: IAPurchaseManager.purchaseFailureNotification, object: nil, userInfo: info)
         }
     }
     

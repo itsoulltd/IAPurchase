@@ -27,9 +27,9 @@ class ViewController: UIViewController {
     
     fileprivate func loadTest(){
         
-        //PurchaseManager.shared.loadIAProducts(productIDs: [], onCompletion:nil)
+        //IAPurchaseManager.shared.loadIAProducts(productIDs: [], onCompletion:nil)
         
-        PurchaseManager.shared.loadIAProducts(productIDs: ["com.tasnim.kitemakeup.subscription.yearly","com.tasnim.kitemakeup.subscription.monthly"])
+        IAPurchaseManager.shared.loadIAProducts(productIDs: ["com.tasnim.kitemakeup.subscription.yearly","com.tasnim.kitemakeup.subscription.monthly"])
         { (items: [IAProduct]?) in
             guard let items = items else{
                 return
@@ -38,53 +38,49 @@ class ViewController: UIViewController {
                 print("\(iapProduct.product.productIdentifier) : \(iapProduct.formattedPrice)")
                 print("\(iapProduct.product.localizedDescription)")
             }
-            
-            //Adding New Items
-            DispatchQueue.main.async {
-                PurchaseManager.shared.loadIAProducts(productIDs: ["com.tasnim.kitemakeup.onetimepurchase"], onCompletion: { (items: [IAProduct]?) in
-                    guard let items = items else{
-                        return
-                    }
-                    for iapProduct in items{
-                        print("\(iapProduct.product.productIdentifier) : \(iapProduct.formattedPrice)")
-                        print("\(iapProduct.product.localizedDescription)")
-                    }
-                    
-                    //Just Fetching existing items
-                    DispatchQueue.main.async {
-                        PurchaseManager.shared.loadIAProducts(productIDs: [], onCompletion: { (items: [IAProduct]?) in
-                            guard let items = items else{
-                                return
-                            }
-                            for iapProduct in items{
-                                print("\(iapProduct.product.productIdentifier) : \(iapProduct.formattedPrice)")
-                                print("\(iapProduct.product.localizedDescription)")
-                            }
-                            
-                            //Nothing Check
-                            DispatchQueue.main.async {
-                                PurchaseManager.shared.loadIAProducts(productIDs: [], onCompletion:nil)
-                            }
-                        })
-                    }
-                })
-            }
         }
+        
+        //Adding New Items
+        IAPurchaseManager.shared.loadIAProducts(productIDs: ["com.tasnim.kitemakeup.onetimepurchase", "com.tasnim.kitemakeup.subscription.yearly"], onCompletion: { (items: [IAProduct]?) in
+            guard let items = items else{
+                return
+            }
+            for iapProduct in items{
+                print("\(iapProduct.product.productIdentifier) : \(iapProduct.formattedPrice)")
+                print("\(iapProduct.product.localizedDescription)")
+            }
+        })
+        
+        //Just Fetching existing items
+        IAPurchaseManager.shared.loadIAProducts(productIDs: [], onCompletion: { (items: [IAProduct]?) in
+            guard let items = items else{
+                return
+            }
+            for iapProduct in items{
+                print("\(iapProduct.product.productIdentifier) : \(iapProduct.formattedPrice)")
+                print("\(iapProduct.product.localizedDescription)")
+            }
+            
+            //Nothing Check
+            DispatchQueue.main.async {
+                IAPurchaseManager.shared.loadIAProducts(productIDs: [], onCompletion:nil)
+            }
+        })
         
     }
     
     fileprivate func purchaseTest() {
         // Do any additional setup after loading the view, typically from a nib.
-        PurchaseManager.shared.loadIAProducts(productIDs: ["com.tasnim.kitemakeup.subscription.yearly","com.tasnim.kitemakeup.onetimepurchase"]) { (items: [IAProduct]?) in
+        IAPurchaseManager.shared.loadIAProducts(productIDs: ["com.tasnim.kitemakeup.subscription.yearly","com.tasnim.kitemakeup.onetimepurchase"]) { (items: [IAProduct]?) in
             //
             guard let xsubs = items else{
                 //If there is no internet and user ever had a purchse.
-                PurchaseManager.shared.uploadReceipt(completion: { (success) in
+                IAPurchaseManager.shared.uploadReceipt(completion: { (success) in
                     //This is offline test.
                     let purchasedId = "com.tasnim.kitemakeup.subscription.yearly"
-                    if PurchaseManager.shared.isPurchased(iapID: purchasedId){
+                    if IAPurchaseManager.shared.isPurchased(iapID: purchasedId){
                         
-                        let type = PurchaseManager.shared.productType(by: purchasedId)
+                        let type = IAPurchaseManager.shared.productType(by: purchasedId)
                         if type is Subscription{
                             guard let paidSubs = type as? Subscription else{
                                 return
@@ -101,7 +97,7 @@ class ViewController: UIViewController {
                             print("TransactionID : \(paidSubs.transactionId)")
                         }
                         
-                        print("Receipt Status : \(PurchaseManager.shared.currentSessionStatus.toString())")
+                        print("Receipt Status : \(IAPurchaseManager.shared.currentSessionStatus.toString())")
                         
                     }
                 })
@@ -114,8 +110,8 @@ class ViewController: UIViewController {
                 
                 //How to purchase, for testing first one is purchased.
                 if iapProduct.identifier == "com.tasnim.kitemakeup.onetimepurchase"{
-                    //PurchaseManager.shared.restorePurchases()
-                    PurchaseManager.shared.purchase(iapID: "com.tasnim.kitemakeup.onetimepurchase", onCompletion: { (isInitiated) in
+                    //IAPurchaseManager.shared.restorePurchases()
+                    IAPurchaseManager.shared.purchase(iapID: "com.tasnim.kitemakeup.onetimepurchase", onCompletion: { (isInitiated) in
                         print("Purchase Initiated \(isInitiated)")
                     })
                 }
@@ -134,9 +130,9 @@ class ViewController: UIViewController {
         
         guard let purchasedId = note.userInfo?["id"] as? String else { return }
         
-        if PurchaseManager.shared.isPurchased(iapID: purchasedId){
+        if IAPurchaseManager.shared.isPurchased(iapID: purchasedId){
             
-            let type = PurchaseManager.shared.productType(by: purchasedId)
+            let type = IAPurchaseManager.shared.productType(by: purchasedId)
             if type is Subscription{
                 guard let paidSubs = type as? Subscription else{
                     return
@@ -153,7 +149,7 @@ class ViewController: UIViewController {
                 print("TransactionID : \(paidSubs.transactionId)")
             }
             
-            print("Receipt Status : \(PurchaseManager.shared.currentSessionStatus.toString())")
+            print("Receipt Status : \(IAPurchaseManager.shared.currentSessionStatus.toString())")
             
         }else{
             print("Unsatisfied results")

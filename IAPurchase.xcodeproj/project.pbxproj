@@ -14,11 +14,15 @@
 		2674DD6D1F9B95AC000BEDF2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2674DD6C1F9B95AC000BEDF2 /* Assets.xcassets */; };
 		2674DD701F9B95AC000BEDF2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2674DD6E1F9B95AC000BEDF2 /* LaunchScreen.storyboard */; };
 		2674DD781F9B98CF000BEDF2 /* PaymentQueueObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2674DD771F9B98CF000BEDF2 /* PaymentQueueObserver.swift */; };
-		2674DD7A1F9B9988000BEDF2 /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2674DD791F9B9988000BEDF2 /* PurchaseManager.swift */; };
+		2674DD7A1F9B9988000BEDF2 /* IAPurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2674DD791F9B9988000BEDF2 /* IAPurchaseManager.swift */; };
 		2674DD7E1F9B9994000BEDF2 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2674DD7B1F9B9994000BEDF2 /* Subscription.swift */; };
 		2674DD7F1F9B9994000BEDF2 /* IAProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2674DD7C1F9B9994000BEDF2 /* IAProduct.swift */; };
 		2674DD801F9B9994000BEDF2 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2674DD7D1F9B9994000BEDF2 /* Session.swift */; };
 		2674DD821F9BB441000BEDF2 /* CoreDataStack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2674DD811F9BB441000BEDF2 /* CoreDataStack.framework */; };
+		8F04BE5D2084E40300B26D2A /* IAOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F04BE5A2084E40300B26D2A /* IAOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8F04BE5E2084E40300B26D2A /* IAOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F04BE5B2084E40300B26D2A /* IAOperation.m */; };
+		8F04BE5F2084E40300B26D2A /* OperationProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F04BE5C2084E40300B26D2A /* OperationProtocol.h */; };
+		8F04BE612084E4F700B26D2A /* SKQueueOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F04BE602084E4F700B26D2A /* SKQueueOperation.swift */; };
 		8FFCF0AE207DF61100DBBB1C /* IAPurchase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2674DD541F9B9597000BEDF2 /* IAPurchase.framework */; };
 		8FFCF0AF207DF61100DBBB1C /* IAPurchase.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2674DD541F9B9597000BEDF2 /* IAPurchase.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8FFCF0B3207DF69200DBBB1C /* CoreDataStack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2674DD811F9BB441000BEDF2 /* CoreDataStack.framework */; };
@@ -62,11 +66,15 @@
 		2674DD6F1F9B95AC000BEDF2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2674DD711F9B95AC000BEDF2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2674DD771F9B98CF000BEDF2 /* PaymentQueueObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentQueueObserver.swift; sourceTree = "<group>"; };
-		2674DD791F9B9988000BEDF2 /* PurchaseManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
+		2674DD791F9B9988000BEDF2 /* IAPurchaseManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAPurchaseManager.swift; sourceTree = "<group>"; };
 		2674DD7B1F9B9994000BEDF2 /* Subscription.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
 		2674DD7C1F9B9994000BEDF2 /* IAProduct.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IAProduct.swift; sourceTree = "<group>"; };
 		2674DD7D1F9B9994000BEDF2 /* Session.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		2674DD811F9BB441000BEDF2 /* CoreDataStack.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CoreDataStack.framework; sourceTree = "<group>"; };
+		8F04BE5A2084E40300B26D2A /* IAOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAOperation.h; sourceTree = "<group>"; };
+		8F04BE5B2084E40300B26D2A /* IAOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAOperation.m; sourceTree = "<group>"; };
+		8F04BE5C2084E40300B26D2A /* OperationProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OperationProtocol.h; sourceTree = "<group>"; };
+		8F04BE602084E4F700B26D2A /* SKQueueOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKQueueOperation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,9 +121,10 @@
 		2674DD561F9B9597000BEDF2 /* IAPurchase */ = {
 			isa = PBXGroup;
 			children = (
-				2674DD791F9B9988000BEDF2 /* PurchaseManager.swift */,
+				8F04BE592084E40300B26D2A /* Operations */,
 				2674DD761F9B98AF000BEDF2 /* Observer */,
 				2674DD751F9B98A6000BEDF2 /* Models */,
+				2674DD791F9B9988000BEDF2 /* IAPurchaseManager.swift */,
 				2674DD571F9B9597000BEDF2 /* IAPurchase.h */,
 				2674DD581F9B9597000BEDF2 /* Info.plist */,
 			);
@@ -153,6 +162,17 @@
 			path = Observer;
 			sourceTree = "<group>";
 		};
+		8F04BE592084E40300B26D2A /* Operations */ = {
+			isa = PBXGroup;
+			children = (
+				8F04BE5A2084E40300B26D2A /* IAOperation.h */,
+				8F04BE5B2084E40300B26D2A /* IAOperation.m */,
+				8F04BE5C2084E40300B26D2A /* OperationProtocol.h */,
+				8F04BE602084E4F700B26D2A /* SKQueueOperation.swift */,
+			);
+			path = Operations;
+			sourceTree = "<group>";
+		};
 		8FFCF0AC207DF5FB00DBBB1C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -167,7 +187,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8F04BE5D2084E40300B26D2A /* IAOperation.h in Headers */,
 				2674DD591F9B9597000BEDF2 /* IAPurchase.h in Headers */,
+				8F04BE5F2084E40300B26D2A /* OperationProtocol.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,8 +299,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				2674DD801F9B9994000BEDF2 /* Session.swift in Sources */,
-				2674DD7A1F9B9988000BEDF2 /* PurchaseManager.swift in Sources */,
+				2674DD7A1F9B9988000BEDF2 /* IAPurchaseManager.swift in Sources */,
+				8F04BE612084E4F700B26D2A /* SKQueueOperation.swift in Sources */,
 				2674DD7E1F9B9994000BEDF2 /* Subscription.swift in Sources */,
+				8F04BE5E2084E40300B26D2A /* IAOperation.m in Sources */,
 				2674DD7F1F9B9994000BEDF2 /* IAProduct.swift in Sources */,
 				2674DD781F9B98CF000BEDF2 /* PaymentQueueObserver.swift in Sources */,
 			);

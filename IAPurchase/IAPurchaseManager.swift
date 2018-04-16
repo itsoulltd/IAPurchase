@@ -26,14 +26,14 @@ import StoreKit
 public typealias OnProductsLoadCompletion = ([IAProduct]?) -> Void
 
 @objcMembers
-public class PurchaseManager: NSObject {
+public class IAPurchaseManager: NSObject {
     
     public static let restoreSuccessfulNotification = Notification.Name("SubscriptionServiceRestoreSuccessfulNotification")
     public static let restoreFailureNotification = Notification.Name("SubscriptionServiceRestoreFailureNotification")
     public static let purchaseSuccessfulNotification = Notification.Name("SubscriptionServicePurchaseSuccessfulNotification")
     public static let purchaseFailureNotification = Notification.Name("SubscriptionServicePurchaseFailureNotification")
     
-    public static let shared = PurchaseManager()
+    public static let shared = IAPurchaseManager()
     
     public let simulatedStartDate: Date
     private var savedSession: Session?
@@ -54,15 +54,12 @@ public class PurchaseManager: NSObject {
     
     public var currentSubscription: Subscription?
     
-    fileprivate var onLoadCompletionBlock: OnProductsLoadCompletion?
-    public var products: [IAProduct]? {
-        didSet {
-            if let block = onLoadCompletionBlock{
-                block(products)
-                onLoadCompletionBlock = nil
-            }
-        }
-    }
+    public var products: [IAProduct]?
+    fileprivate lazy var StoreQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
     
     private override init() {
         let persistedDateKey = "SimulatedStartDate"
@@ -83,22 +80,6 @@ public class PurchaseManager: NSObject {
     
     public func stopTransactionObserver(){
         paymentObserver.removeObserver()
-    }
-    
-    public func loadIAProducts(productIDs:[String], onCompletion:OnProductsLoadCompletion? = nil) {
-        if productIDs.count == 0 && onCompletion != nil {
-            onCompletion!(self.products)
-            return
-        }
-        if onLoadCompletionBlock != nil{
-            return
-        }
-        if productIDs.count > 0{
-            if (onCompletion != nil) { onLoadCompletionBlock = onCompletion }
-            let request = SKProductsRequest(productIdentifiers: Set(productIDs))
-            request.delegate = self
-            request.start()
-        }
     }
     
     public func purchase(inAppProduct: IAProduct) {
@@ -172,6 +153,24 @@ public class PurchaseManager: NSObject {
         }
     }
     
+    public func loadOfflineReceipt(completion: @escaping ((_ success: Bool) -> Void)) {
+        //Try to load Last Saved Session
+        DispatchQueue.global(qos: .background).async {
+            if let session = self.restoreLastSession(){
+                DispatchQueue.main.async {
+                    self.savedSession = session
+                    self.currentSubscription = session.currentSubscription
+                    completion(true)
+                }
+            }
+            else {
+                DispatchQueue.main.async {
+                    completion(false)
+                }
+            }
+        }
+    }
+    
     private func upload(receipt data: Data, onCompletion: @escaping (Session?, Error?) -> Void) {
         let body = [
             "receipt-data": data.base64EncodedString(),
@@ -241,15 +240,29 @@ public class PurchaseManager: NSObject {
     
 }
 
-// MARK: - SKProductsRequestDelegate
+// MARK: - SKQueueOperationDelegate
 
-extension PurchaseManager: SKProductsRequestDelegate {
+extension IAPurchaseManager: SKQueueOperationDelegate {
     
-    public func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
+    public func loadIAProducts(productIDs:[String], onCompletion:OnProductsLoadCompletion? = nil) {
+        if productIDs.count == 0 && onCompletion != nil {
+            onCompletion!(self.products)
+            return
+        }
+        if productIDs.count > 0{
+            let operation = SKQueueOperation(productIDs, delegate: self)
+            operation.debugMode = self.debugMode
+            operation.onLoadCompletionBlock = onCompletion
+            //Add to Queue. It will Start Operation imidiately but sequencesilly
+            StoreQueue.addOperation(operation)
+        }
+    }
+    
+    public func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse, onCompletion: OnProductsLoadCompletion?) {
         DispatchQueue.main.async {
             var items = response.products.map { IAProduct(product: $0) }
             if let olds = self.products {
-                //Avoiding Duplication.
+                //Check for Duplication
                 for product in olds{
                     if items.contains(product) == false {
                         items.append(product)
@@ -257,22 +270,28 @@ extension PurchaseManager: SKProductsRequestDelegate {
                 }
             }
             self.products = items
+            if let onCom = onCompletion{
+                onCom(items)
+            }
         }
     }
     
-    public func request(_ request: SKRequest, didFailWithError error: Error) {
+    public func request(_ request: SKRequest, didFailWithError error: Error, onCompletion: OnProductsLoadCompletion?) {
         if request is SKProductsRequest {
             if debugMode {print("Subscription Options Failed Loading: \(error.localizedDescription)")}
         }
         DispatchQueue.main.async {
             self.products = self.products ?? nil
+            if let onCom = onCompletion{
+                onCom(self.products)
+            }
         }
     }
 }
 
 //MARK: 
 
-extension PurchaseManager: PaymentQueueObserverDelegate{
+extension IAPurchaseManager: PaymentQueueObserverDelegate{
     
     public func shouldHandleTransaction(forProductId: String) -> Bool{
         guard let optionItems = self.products else {
@@ -300,3 +319,5 @@ extension PurchaseManager: PaymentQueueObserverDelegate{
     }
     
 }
+
+

@@ -18,9 +18,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         #if DEBUG
-            PurchaseManager.shared.startTransactionObserver(sharedSecrate: "eea3614d1e324465927dc21cde51a60c", debug: true)
+            IAPurchaseManager.shared.startTransactionObserver(sharedSecrate: "eea3614d1e324465927dc21cde51a60c", debug: true)
         #else
-            PurchaseManager.shared.startTransactionObserver(sharedSecrate: "eea3614d1e324465927dc21cde51a60c", debug: false)
+            IAPurchaseManager.shared.startTransactionObserver(sharedSecrate: "eea3614d1e324465927dc21cde51a60c", debug: false)
         #endif
         return true
     }
@@ -45,6 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+        IAPurchaseManager.shared.stopTransactionObserver()
     }
 
 

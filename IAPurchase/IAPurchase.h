@@ -16,4 +16,4 @@ FOUNDATION_EXPORT const unsigned char IAPurchaseVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <IAPurchase/PublicHeader.h>
 
-
+#import <IAPurchase/IAOperation.h>
