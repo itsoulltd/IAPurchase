@@ -123,7 +123,13 @@ public class IAPurchaseManager: NSObject {
         SKPaymentQueue.default().restoreCompletedTransactions()
     }
     
-    public func uploadReceipt(completion: @escaping ((_ success: Bool) -> Void)) {
+    public func uploadReceipt(_ offline:Bool = false, completion: @escaping ((_ success: Bool) -> Void)) {
+        
+        guard offline == false else {
+            loadOfflineReceipt(completion: completion)
+            return
+        }
+        
         if let receiptData = loadReceipt() {
             upload(receipt: receiptData, onCompletion: { [weak self] (session, error) in
                 guard let strongSelf = self else{
@@ -153,7 +159,11 @@ public class IAPurchaseManager: NSObject {
         }
     }
     
-    public func loadOfflineReceipt(completion: @escaping ((_ success: Bool) -> Void)) {
+    private func loadOfflineReceipt(completion: @escaping ((_ success: Bool) -> Void)) {
+        guard hasLastSession() else {
+            completion(false)
+            return
+        }
         //Try to load Last Saved Session
         DispatchQueue.global(qos: .background).async {
             if let session = self.restoreLastSession(){
@@ -215,6 +225,13 @@ public class IAPurchaseManager: NSObject {
         let archieved = NSKeyedArchiver.archivedData(withRootObject: session)
         UserDefaults.standard.set(archieved, forKey: "savedSession_key")
         UserDefaults.standard.synchronize()
+    }
+    
+    private func hasLastSession() -> Bool{
+        guard let _ = UserDefaults.standard.data(forKey: "savedSession_key") else{
+            return false
+        }
+        return true
     }
     
     private func restoreLastSession() -> Session?{
