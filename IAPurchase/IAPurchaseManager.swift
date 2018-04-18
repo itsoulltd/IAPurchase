@@ -123,9 +123,9 @@ public class IAPurchaseManager: NSObject {
         SKPaymentQueue.default().restoreCompletedTransactions()
     }
     
-    public func uploadReceipt(_ offline:Bool = false, completion: @escaping ((_ success: Bool) -> Void)) {
+    public func uploadReceipt(_ online:Bool = true, completion: @escaping ((_ success: Bool) -> Void)) {
         
-        guard offline == false else {
+        guard online == true else {
             loadOfflineReceipt(completion: completion)
             return
         }
