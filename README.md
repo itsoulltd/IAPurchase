@@ -5,7 +5,7 @@ On AppDelegate : application didFinishLunching
         [[IAPurchaseManager shared] startTransactionObserverWithSharedSecrate: SHARED_SECRET debug: YES];
     
       #else
-                BOOL isRunningTestFlightBeta = [[[[NSBundle mainBundle] appStoreReceiptURL] lastPathComponent]          isEqualToString:@"sandboxReceipt"];
+        BOOL isRunningTestFlightBeta = [[[[NSBundle mainBundle] appStoreReceiptURL] lastPathComponent]          isEqualToString:@"sandboxReceipt"];
         if (isRunningTestFlightBeta) {
                 [[IAPurchaseManager shared] startTransactionObserverWithSharedSecrate: SHARED_SECRET debug: YES];
         }
