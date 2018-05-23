@@ -1,11 +1,18 @@
 # IAPurchase
 On AppDelegate : application didFinishLunching
 
-        #if DEBUG
-            IAPurchaseManager.shared.startTransactionObserver(sharedSecrate: "eea3614d1e324465927dc21cde51a60c", debug: true)
-        #else
-            IAPurchaseManager.shared.startTransactionObserver(sharedSecrate: "eea3614d1e324465927dc21cde51a60c")
-        #endif
+      #if DEBUG
+        [[IAPurchaseManager shared] startTransactionObserverWithSharedSecrate: SHARED_SECRET debug: YES];
+    
+      #else
+                BOOL isRunningTestFlightBeta = [[[[NSBundle mainBundle] appStoreReceiptURL] lastPathComponent]          isEqualToString:@"sandboxReceipt"];
+        if (isRunningTestFlightBeta) {
+                [[IAPurchaseManager shared] startTransactionObserverWithSharedSecrate: SHARED_SECRET debug: YES];
+        }
+        else{
+                [[IAPurchaseManager shared] startTransactionObserverWithSharedSecrate: SHARED_SECRET debug: NO];
+        }
+     #endif
         
         //Make this call to make sure, if there is any purchase happen on last app session, then those purchase information will retain automatically.
         IAPurchaseManager.shared.uploadReceipt(offline: true, completion: { (success) in
