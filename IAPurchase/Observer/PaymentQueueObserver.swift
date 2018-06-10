@@ -118,6 +118,8 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
             return
         }
         //print("User purchased product id: \(transaction.payment.productIdentifier)")
+        //TODO: In case of Consumable Products, product information will no longer exist in the receipt after transaction finish.
+        //So, apple recommeds to call finish transaction after receipt validation. So following line should appear within the -uploadReceipt block. (Future impl)
         queue.finishTransaction(transaction)
         IAPurchaseManager.shared.uploadReceipt { (success) in
             guard success else{
