@@ -147,6 +147,7 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
             return
         }
         //print("Purchase failed for product id: \(transaction.payment.productIdentifier)")
+        queue.finishTransaction(transaction)
         DispatchQueue.main.async {
             var info = ["id":transaction.payment.productIdentifier]
             if let err = transaction.error{
