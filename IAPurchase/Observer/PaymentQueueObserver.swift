@@ -100,6 +100,8 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
                 handleFailedState(for: transaction, in: queue)
             case .deferred:
                 handleDeferredState(for: transaction, in: queue)
+            @unknown default:
+                handleDeferredState(for: transaction, in: queue)
             }
         }
     }

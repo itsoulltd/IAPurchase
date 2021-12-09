@@ -32,11 +32,11 @@
 		2674DD7E1F9B9994000BEDF2 /* Subscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2674DD7B1F9B9994000BEDF2 /* Subscription.swift */; };
 		2674DD7F1F9B9994000BEDF2 /* IAProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2674DD7C1F9B9994000BEDF2 /* IAProduct.swift */; };
 		2674DD801F9B9994000BEDF2 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2674DD7D1F9B9994000BEDF2 /* Session.swift */; };
-		2674DD821F9BB441000BEDF2 /* CoreDataStack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2674DD811F9BB441000BEDF2 /* CoreDataStack.framework */; };
 		8F04BE5D2084E40300B26D2A /* IAOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F04BE5A2084E40300B26D2A /* IAOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8F04BE5E2084E40300B26D2A /* IAOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F04BE5B2084E40300B26D2A /* IAOperation.m */; };
 		8F04BE5F2084E40300B26D2A /* OperationProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F04BE5C2084E40300B26D2A /* OperationProtocol.h */; };
 		8F04BE612084E4F700B26D2A /* SKQueueOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F04BE602084E4F700B26D2A /* SKQueueOperation.swift */; };
+		8F43931C2761FF3F00F76253 /* CoreDataStack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2674DD811F9BB441000BEDF2 /* CoreDataStack.framework */; };
 		8FFCF0AE207DF61100DBBB1C /* IAPurchase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2674DD541F9B9597000BEDF2 /* IAPurchase.framework */; };
 		8FFCF0AF207DF61100DBBB1C /* IAPurchase.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2674DD541F9B9597000BEDF2 /* IAPurchase.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8FFCF0B3207DF69200DBBB1C /* CoreDataStack.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2674DD811F9BB441000BEDF2 /* CoreDataStack.framework */; };
@@ -96,7 +96,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2674DD821F9BB441000BEDF2 /* CoreDataStack.framework in Frameworks */,
+				8F43931C2761FF3F00F76253 /* CoreDataStack.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
