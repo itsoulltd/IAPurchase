@@ -34,7 +34,7 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
     
     public func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
         
-        let ids: [String] = queue.transactions.flatMap({ (transaction) -> String? in
+        let ids: [String] = queue.transactions.compactMap({ (transaction) -> String? in
             if (shouldHandle(productId: transaction.payment.productIdentifier) == false){
                 return nil
             }else{
@@ -52,7 +52,7 @@ public class PaymentQueueObserver: NSObject, SKPaymentTransactionObserver {
     
     public func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
         
-        let ids: [String] = queue.transactions.flatMap({ (transaction) -> String? in
+        let ids: [String] = queue.transactions.compactMap({ (transaction) -> String? in
             if (shouldHandle(productId: transaction.payment.productIdentifier) == false){
                 return nil
             }else{

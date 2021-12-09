@@ -51,7 +51,7 @@ public class IAProduct: NSObject {
         formattedPrice = formatter.string(from: product.price) ?? "\(product.price)"
     }
     
-    public override var hashValue: Int{
+    public override var hash: Int{
         return identifier.hashValue
     }
     
